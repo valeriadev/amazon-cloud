@@ -1,22 +1,25 @@
-const AWS = require('aws-sdk');
-AWS.config.update({region: 'us-east-1'});
+require("dotenv").config();
 
-// Create an SQS service object
+const AWS = require('aws-sdk');
+
+AWS.config.update({
+    region: process.env.queueRegion, credentials: new AWS.Credentials(
+        process.env.accessKeyId,
+        process.env.secretAccessKey, process.env.sessionToken)
+});
+
+
 const sqs = new AWS.SQS({apiVersion: '2012-11-05'});
 const params = {
-    QueueUrl: 'https://sqs.us-east-1.amazonaws.com/864437013740/sqs1',
-    AttributeNames: [
-        'All'
-
-    ],
-    MaxNumberOfMessages: '1000',
-    MessageAttributeNames: [
-        'ALL',
-        /* more items */
-    ]
+    QueueUrl: process.env.queueUrl,
+    AttributeNames: ['All'],
+    MaxNumberOfMessages: '10',
+    MessageAttributeNames: ['ALL']
 
 };
+
 sqs.receiveMessage(params, function (err, data) {
-    if (err) console.log(err, err.stack); // an error occurred
-    else console.log(data);           // successful response
+    if (err) console.log(err, err.stack);
+
+    else console.log(data);
 });
